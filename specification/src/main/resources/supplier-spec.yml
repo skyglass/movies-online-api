@@ -6,15 +6,15 @@ info:
   contact:
     email: api-admin@greengrocers-sampleapis.com
 servers:
-- url: https://virtserver.swaggerhub.com/v1
+  - url: https://localhost:8080/v1
+    description: local server
+
 tags:
-- name: user
-  description: Operations about user
-  externalDocs:
-    description: Find out more about our store
-    url: http://swagger.io
+  - name: Supplier API
+    description: Operations with Supplier API
+
 paths:
-  /healthCheck:
+  /suppliersHealthCheck:
     get:
       tags:
         - developers
@@ -41,7 +41,7 @@ paths:
       tags:
         - admins
       summary: list of all available suppliers
-      operationId: suppliers
+      operationId: getSuppliers
       description: |
         Fetch all the Suppliers of GreenGrocers (admin only)
       responses:
@@ -51,6 +51,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SupplierSummary'
+    post:
+      tags:
+        - admins
+      summary: Add a new supplier
+      operationId: addSupplier
+      responses:
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Supplier'
+  '/suppliers/{supplierId}':
+    get:
+      tags:
+        - admin
+      summary: Fetch a specific Supplier details by given supplier code
+      operationId: getSupplierBySupplierCode
+      description:
+        Return a Single Supplier
+      parameters:
+        - name: supplierId
+          in: path
+          description: supplier Id of Supplier details to be returned
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Supplier not found
 components:
   schemas:
     HealthCheckStatus:
@@ -74,7 +113,36 @@ components:
           type: array
           description: supplier IDs as Array object
           items:
-            type: string
+            $ref: '#/components/schemas/Supplier'
       example:
         - id: 343-23232-232323
         - id: 342-34355-543534
+    Supplier:
+      type: object
+      required:
+        - supplierId
+        - supplierCode
+        - supplierName
+        - supplierType
+      properties:
+        supplierId:
+          type: string
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        supplierType:
+          type: integer
+          format: int32
+
+  requestBodies:
+    Supplier:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Supplier'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Supplier'
+      description: Supplier object that needs to be added to the Suppliers
+      required: true
