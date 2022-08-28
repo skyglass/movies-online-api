@@ -1,0 +1,80 @@
+openapi: 3.0.2
+info:
+  description: Product catalogue APIs for Suppliers
+  version: 0.0.1-SNAPSHOT
+  title: Products Inventory API for Greengrocers Suppliers
+  contact:
+    email: api-admin@greengrocers-sampleapis.com
+servers:
+- url: https://virtserver.swaggerhub.com/v1
+tags:
+- name: user
+  description: Operations about user
+  externalDocs:
+    description: Find out more about our store
+    url: http://swagger.io
+paths:
+  /healthCheck:
+    get:
+      tags:
+        - developers
+      summary: A health check ping for suppliers APIs
+      description: Ping API and may want to use before calling the other heavy APIs
+      operationId: healthCheck
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckStatus'
+              example: healthy
+        '400':
+          description: Not healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckStatus'
+              example: One or more health checks are failing
+  /suppliers:
+    get:
+      tags:
+        - admins
+      summary: list of all available suppliers
+      operationId: suppliers
+      description: |
+        Fetch all the Suppliers of GreenGrocers (admin only)
+      responses:
+        '200':
+          description: returns all the available suppliers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierSummary'
+components:
+  schemas:
+    HealthCheckStatus:
+      type: object
+      properties:
+        appId:
+          type: string
+        healthState:
+          type: string
+          description: state of the app health
+          enum:
+            - Down
+            - Up
+            - Unknown
+    SupplierSummary:
+      type: object
+      required:
+        - records
+      properties:
+        records:
+          type: array
+          description: supplier IDs as Array object
+          items:
+            type: string
+      example:
+        - id: 343-23232-232323
+        - id: 342-34355-543534
